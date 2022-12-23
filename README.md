@@ -27,7 +27,7 @@ This app takes images, videos, dicom or pointclouds project and splits its datas
 
 1. Open the context menu of a project and run the app
 
-<img src="xxx">
+<img src="https://user-images.githubusercontent.com/115161827/209393639-1eb69ed0-e532-4288-96af-06b4473eacc7.gif">
 
 2. Select the projects you to split datasets in
 
