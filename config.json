@@ -1,16 +1,21 @@
 {
   "type": "app",
   "version": "2.0.0",
-  "name": "[test] Split datasets",
+  "name": "Split datasets",
   "description": "Split one or multiple datasets into parts",
   "categories": [
+    "data operations",
     "images",
-    "data operations"
+    "videos",
+    "dicom",
+    "pointclouds",
+    "projects management"
   ],
   "icon": "",
   "poster": "",
   "entrypoint": "python -m uvicorn src.main:app --host 0.0.0.0 --port 8000",
   "context_menu": {
+    "context_category": "Transform",
     "target": [
       "images_project",
       "videos_project",
@@ -19,7 +24,5 @@
       "point_cloud_episodes_project"
     ]
   },
-  "headless": false,
-  "release": { "version":"v1.0.0", "name":"init" },
-  "slug": "niko/test-split-dataset-11"
+  "headless": false
 }
