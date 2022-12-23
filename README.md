@@ -35,5 +35,5 @@ This app takes images, videos, dicom or pointclouds project and splits its datas
 
 ## Screenshot
 
-<img src="https://user-images.githubusercontent.com/115161827/209338365-aba69911-6e94-446d-973f-a9811ef35458.png">
+<img src="https://user-images.githubusercontent.com/115161827/209395515-813138fd-0d0f-40b4-92d1-10d39b7e149a.png">
 
