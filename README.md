@@ -29,7 +29,7 @@ This app takes images, videos, dicom or pointclouds project and splits its datas
 
 <img src="https://user-images.githubusercontent.com/115161827/209393639-1eb69ed0-e532-4288-96af-06b4473eacc7.gif">
 
-2. Select the projects you to split datasets in
+2. Select the projects you want to split datasets in
 
 3. Set up settings to your needs and click `Start`
 
