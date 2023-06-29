@@ -8,8 +8,8 @@ from supervisely.app.widgets import (
     ProjectThumbnail,
 )
 from supervisely.app.widgets import ProjectThumbnail
-import src.globals as g
-import src.ui as ui
+import globals as g
+import ui as ui
 
 
 # for convenient debug, has no effect in production

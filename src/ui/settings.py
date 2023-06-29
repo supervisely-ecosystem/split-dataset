@@ -11,8 +11,8 @@ from supervisely.app.widgets import (
     Field,
 )
 from supervisely import ProjectType
-import src.globals as g
-from .dataset_selector import selected_datasets
+import globals as g
+from dataset_selector import selected_datasets
 
 
 settings_by_percent = Field(
@@ -126,9 +126,7 @@ def get_settings():
 
     method = select_method_options.get_value()
     if method == str(g.SplitMethod.BY_RATIO):
-        parameters = [
-            int(x) for x in settings[method][2]._content.get_value().split(":")
-        ]
+        parameters = [int(x) for x in settings[method][2]._content.get_value().split(":")]
     else:
         parameters = [int(settings[method][2]._content.get_value())]
     return {
