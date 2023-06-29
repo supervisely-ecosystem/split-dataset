@@ -4,8 +4,8 @@ import supervisely as sly
 from supervisely.app.widgets.sly_tqdm.sly_tqdm import CustomTqdm
 from supervisely.video_annotation.key_id_map import KeyIdMap
 from supervisely.api.module_api import ApiField
-
-import src.globals as g
+import os
+import globals as g
 
 
 def _get_parts_by_parts_number(n: int, parts_n: int):
@@ -43,9 +43,7 @@ def _get_parts(split_method: str, n: int, split_params: List[int]):
         return _get_parts_by_ratio(n, split_params)
 
 
-def _get_or_create_destination_project(
-    api: sly.Api, project_info: sly.ProjectInfo, settings: dict
-):
+def _get_or_create_destination_project(api: sly.Api, project_info: sly.ProjectInfo, settings: dict):
     destination = settings["destination"]
     if destination["new"]:
         dest_project_info = api.project.create(
@@ -68,18 +66,14 @@ def _get_or_create_destination_project(
     return dest_project_info
 
 
-def _create_destination_dataset(
-    api: sly.Api, project_id: int, name: str, description: str
-):
+def _create_destination_dataset(api: sly.Api, project_id: int, name: str, description: str):
     created_dataset = api.dataset.create(
         project_id=project_id,
         name=name,
         description=description,
         change_name_if_conflict=True,
     )
-    sly.logger.info(
-        f'Created dataset. Name: "{created_dataset.name}", Id: {created_dataset.id}'
-    )
+    sly.logger.info(f'Created dataset. Name: "{created_dataset.name}", Id: {created_dataset.id}')
     return created_dataset
 
 
@@ -97,9 +91,7 @@ def _split_images(
         # create dataset
         ds_name = dataset_info.name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
-        created_dataset = _create_destination_dataset(
-            api, project_info.id, ds_name, ds_description
-        )
+        created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
 
         # copy images with annotations
         api.image.copy_batch(
@@ -129,9 +121,7 @@ def _split_videos(
         # create dataset
         ds_name = dataset_info.name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
-        created_dataset = _create_destination_dataset(
-            api, project_info.id, ds_name, ds_description
-        )
+        created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
 
         # copy videos and annotations
         for video_info in videos[copied : copied + part]:
@@ -148,9 +138,7 @@ def _split_videos(
                     hash=video_info.hash,
                 )
             else:
-                sly.logger.warn(
-                    f"{video_info.name} have no hash or link. Item will be skipped."
-                )
+                sly.logger.warn(f"{video_info.name} have no hash or link. Item will be skipped.")
                 if progress_bar is not None:
                     progress_bar.update(1)
                 continue
@@ -159,9 +147,7 @@ def _split_videos(
             ann = sly.VideoAnnotation.from_json(
                 data=ann_json, project_meta=project_meta, key_id_map=key_id_map
             )
-            api.video.annotation.append(
-                video_id=new_video_info.id, ann=ann, key_id_map=key_id_map
-            )
+            api.video.annotation.append(video_id=new_video_info.id, ann=ann, key_id_map=key_id_map)
 
             if progress_bar is not None:
                 progress_bar.update(1)
@@ -181,15 +167,14 @@ def _copy_pointcloud(
     progress_bar: CustomTqdm = None,
 ):
     pcds_infos = api.pointcloud.get_list(dataset_id=dataset_info.id)
-    key_id_map = KeyIdMap()
+    key_id_map_initial = KeyIdMap()
+    key_id_map_new = KeyIdMap()
     copied = 0
     for i, part in enumerate(parts):
         # create dataset
         ds_name = dataset_info.name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
-        created_dataset = _create_destination_dataset(
-            api, project_info.id, ds_name, ds_description
-        )
+        created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
 
         # copy pointclouds with annotations
         for pcd_info in pcds_infos[copied : copied + part]:
@@ -203,11 +188,11 @@ def _copy_pointcloud(
 
                 ann_json = api.pointcloud.annotation.download(pointcloud_id=pcd_info.id)
                 ann = sly.PointcloudAnnotation.from_json(
-                    data=ann_json, project_meta=project_meta, key_id_map=KeyIdMap()
+                    data=ann_json, project_meta=project_meta, key_id_map=key_id_map_initial
                 )
 
                 api.pointcloud.annotation.append(
-                    pointcloud_id=new_pcd_info.id, ann=ann, key_id_map=key_id_map
+                    pointcloud_id=new_pcd_info.id, ann=ann, key_id_map=key_id_map_new
                 )
 
                 rel_images = api.pointcloud.get_list_related_images(id=pcd_info.id)
@@ -250,13 +235,9 @@ def _copy_pointcloud_episodes(
         # create dataset
         ds_name = dataset_info.name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
-        created_dataset = _create_destination_dataset(
-            api, project_info.id, ds_name, ds_description
-        )
+        created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
 
-        ann_json = api.pointcloud_episode.annotation.download(
-            dataset_id=dataset_info.id
-        )
+        ann_json = api.pointcloud_episode.annotation.download(dataset_id=dataset_info.id)
         ann = sly.PointcloudEpisodeAnnotation.from_json(
             data=ann_json, project_meta=project_meta, key_id_map=KeyIdMap()
         )
@@ -271,13 +252,9 @@ def _copy_pointcloud_episodes(
                 meta=pcd_episode_info.meta,
             )
 
-            frame_to_pointcloud_ids[
-                new_pcd_episode_info.meta["frame"]
-            ] = new_pcd_episode_info.id
+            frame_to_pointcloud_ids[new_pcd_episode_info.meta["frame"]] = new_pcd_episode_info.id
 
-            rel_images = api.pointcloud_episode.get_list_related_images(
-                id=pcd_episode_info.id
-            )
+            rel_images = api.pointcloud_episode.get_list_related_images(id=pcd_episode_info.id)
             if len(rel_images) != 0:
                 rimg_infos = []
                 for rel_img in rel_images:
@@ -291,9 +268,7 @@ def _copy_pointcloud_episodes(
                     )
                 api.pointcloud_episode.add_related_images(rimg_infos)
             else:
-                sly.logger.warn(
-                    f"{pcd_episode_info.name} have no hash. Item will be skipped."
-                )
+                sly.logger.warn(f"{pcd_episode_info.name} have no hash. Item will be skipped.")
 
             if progress_bar is not None:
                 progress_bar.update(1)
@@ -326,9 +301,10 @@ def _copy_volume(
         # create dataset
         ds_name = dataset_info.name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
-        created_dataset = _create_destination_dataset(
-            api, project_info.id, ds_name, ds_description
-        )
+        created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
+
+        geometries_dir = f"geometries_{created_dataset.id}"
+        sly.fs.mkdir(geometries_dir)
 
         for volume_info in volumes_infos[copied : copied + part]:
             if volume_info.hash:
@@ -345,10 +321,24 @@ def _copy_volume(
                 api.volume.annotation.append(
                     volume_id=new_volume_info.id, ann=ann, key_id_map=key_id_map
                 )
+
+                if ann.spatial_figures:
+                    geometries = []
+                    for sf in ann_json.get("spatialFigures"):
+                        sf_id = sf.get("id")
+                        path = os.path.join(geometries_dir, f"{sf_id}.nrrd")
+                        api.volume.figure.download_stl_meshes([sf_id], [path])
+                        with open(path, "rb") as file:
+                            geometry_bytes = file.read()
+                        geometries.append(geometry_bytes)
+
+                    api.volume.figure.upload_sf_geometry(
+                        ann.spatial_figures, geometries, key_id_map=key_id_map
+                    )
+                    del geometries
+
             else:
-                sly.logger.warn(
-                    f"{volume_info.name} have no hash. Item will be skipped."
-                )
+                sly.logger.warn(f"{volume_info.name} have no hash. Item will be skipped.")
 
             if progress_bar is not None:
                 progress_bar.update(1)
@@ -357,6 +347,7 @@ def _copy_volume(
             f'Copied {part} items to dataset "{created_dataset.name}"(id: {created_dataset.id})'
         )
         copied += part
+        sly.fs.remove_dir(geometries_dir)
 
 
 def split(
@@ -379,9 +370,7 @@ def split(
         if dest_project_info.type == str(sly.ProjectType.IMAGES):
             _split_images(api, dest_project_info, dataset, parts, progress_bar)
         if dest_project_info.type == str(sly.ProjectType.VIDEOS):
-            _split_videos(
-                api, dest_project_info, dest_project_meta, dataset, parts, progress_bar
-            )
+            _split_videos(api, dest_project_info, dest_project_meta, dataset, parts, progress_bar)
         if dest_project_info.type == str(sly.ProjectType.POINT_CLOUDS):
             _copy_pointcloud(
                 api, dest_project_info, dest_project_meta, dataset, parts, progress_bar
@@ -391,9 +380,7 @@ def split(
                 api, dest_project_info, dest_project_meta, dataset, parts, progress_bar
             )
         if dest_project_info.type == str(sly.ProjectType.VOLUMES):
-            _copy_volume(
-                api, dest_project_info, dest_project_meta, dataset, parts, progress_bar
-            )
+            _copy_volume(api, dest_project_info, dest_project_meta, dataset, parts, progress_bar)
 
     dest_project_info = api.project.get_info_by_id(dest_project_info.id)
     return dest_project_info
