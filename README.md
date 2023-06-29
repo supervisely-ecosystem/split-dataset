@@ -18,7 +18,7 @@
 
 # Overview
 
-This app takes images, videos, dicom or pointclouds project and splits its datasets. You can select datasets you want to split, how to split them, and where to save the result. You can split datasets by their items count, parts, percent or ratio.
+This app takes images, videos, dicom, or point cloud projects and splits its datasets. You can select datasets you want to split, how to split them, and where to save the result. You can split datasets by item count, parts, percent, or ratio.
 
 
 # How to Run
