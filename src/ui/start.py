@@ -1,7 +1,7 @@
 from supervisely.app.widgets import Button, Progress, ProjectThumbnail, Container
-import globals as g
-import ui as ui
-from split import split
+import src.globals as g
+import src.ui as ui
+from src.split import split
 
 
 start_button = Button("Start", icon="zmdi zmdi-play")

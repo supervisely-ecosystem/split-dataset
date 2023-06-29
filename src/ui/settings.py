@@ -11,8 +11,8 @@ from supervisely.app.widgets import (
     Field,
 )
 from supervisely import ProjectType
-import globals as g
-from dataset_selector import selected_datasets
+import src.globals as g
+from .dataset_selector import selected_datasets
 
 
 settings_by_percent = Field(

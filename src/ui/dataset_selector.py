@@ -1,6 +1,6 @@
 import supervisely as sly
 from supervisely.app.widgets import Button, Card, Table, Text, Container, Flexbox
-import globals as g
+import src.globals as g
 import pandas as pd
 
 

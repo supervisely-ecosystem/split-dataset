@@ -5,7 +5,7 @@ from supervisely.app.widgets.sly_tqdm.sly_tqdm import CustomTqdm
 from supervisely.video_annotation.key_id_map import KeyIdMap
 from supervisely.api.module_api import ApiField
 import os
-import globals as g
+import src.globals as g
 
 
 def _get_parts_by_parts_number(n: int, parts_n: int):
