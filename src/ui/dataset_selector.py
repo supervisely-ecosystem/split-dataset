@@ -1,5 +1,4 @@
 import supervisely as sly
-from supervisely.app.content import DataJson
 from supervisely.app.widgets import Button, Card, Table, Text, Container, Flexbox
 import src.globals as g
 import pandas as pd
@@ -61,15 +60,11 @@ def handle_table_button(datapoint: sly.app.widgets.Table.ClickedDataPoint):
         selected_datasets_names.add(dataset_name)
         table.update_cell_value(COL_ID, dataset_id, SELECT_DATASET, "✅")
     table.clear_selection()
-    selected_datasets.set(
-        f'Selected datasets: {", ".join(list(selected_datasets_names))}', "text"
-    )
+    selected_datasets.set(f'Selected datasets: {", ".join(list(selected_datasets_names))}', "text")
 
 
 select_all_button = Button("Select all", button_type="text", icon="zmdi zmdi-check-all")
-deselect_all_button = Button(
-    "Deselect all", button_type="text", icon="zmdi zmdi-square-o"
-)
+deselect_all_button = Button("Deselect all", button_type="text", icon="zmdi zmdi-square-o")
 update_table_button = Button("Refresh", button_type="text", icon="zmdi zmdi-refresh")
 
 
@@ -77,12 +72,8 @@ update_table_button = Button("Refresh", button_type="text", icon="zmdi zmdi-refr
 def select_all_datasets():
     global selected_datasets_names
     g.SELECTED_DATASETS_IDS = set([id for id in g.DATASETS_INFO.keys()])
-    selected_datasets_names = set(
-        [dataset.name for dataset in g.DATASETS_INFO.values()]
-    )
-    selected_datasets.set(
-        f'Selected datasets: {", ".join(list(selected_datasets_names))}', "text"
-    )
+    selected_datasets_names = set([dataset.name for dataset in g.DATASETS_INFO.values()])
+    selected_datasets.set(f'Selected datasets: {", ".join(list(selected_datasets_names))}', "text")
     table.update_matching_cells(SELECT_DATASET, "", SELECT_DATASET, "✅")
 
 
@@ -91,9 +82,7 @@ def deselect_all_datasets():
     global selected_datasets_names
     g.SELECTED_DATASETS_IDS = set()
     selected_datasets_names = set()
-    selected_datasets.set(
-        f'Selected datasets: {", ".join(list(selected_datasets_names))}', "text"
-    )
+    selected_datasets.set(f'Selected datasets: {", ".join(list(selected_datasets_names))}', "text")
     table.update_matching_cells(SELECT_DATASET, "✅", SELECT_DATASET, "")
 
 
@@ -102,9 +91,7 @@ def update_table():
     global selected_datasets_names
     g.SELECTED_DATASETS_IDS = set()
     selected_datasets_names = set()
-    selected_datasets.set(
-        f'Selected datasets: {", ".join(list(selected_datasets_names))}', "text"
-    )
+    selected_datasets.set(f'Selected datasets: {", ".join(list(selected_datasets_names))}', "text")
     build_table()
 
 
@@ -114,9 +101,7 @@ dataset_selector_card = Card(
     collapsable=False,
     content=Container(
         widgets=[
-            Flexbox(
-                widgets=[update_table_button, select_all_button, deselect_all_button]
-            ),
+            Flexbox(widgets=[update_table_button, select_all_button, deselect_all_button]),
             table,
         ]
     ),

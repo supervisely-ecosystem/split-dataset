@@ -1,4 +1,4 @@
-from supervisely.app.widgets import Button, Progress, Text, ProjectThumbnail, Container
+from supervisely.app.widgets import Button, Progress, ProjectThumbnail, Container
 import src.globals as g
 import src.ui as ui
 from src.split import split
