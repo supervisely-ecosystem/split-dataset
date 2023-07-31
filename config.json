@@ -3,7 +3,7 @@
     "version": "2.0.0",
     "name": "Split datasets",
     "description": "Split one or multiple datasets into parts",
-    "docker_image": "supervisely/data-operations:0.0.3",
+    "docker_image": "supervisely/data-operations:0.0.5",
     "categories": [
         "data operations",
         "images",
