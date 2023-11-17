@@ -1,30 +1,30 @@
 {
-    "type": "app",
-    "version": "2.0.0",
-    "name": "Split datasets",
-    "description": "Split one or multiple datasets into parts",
-    "docker_image": "supervisely/data-operations:0.0.5",
-    "categories": [
-        "data operations",
-        "images",
-        "videos",
-        "dicom",
-        "pointclouds",
-        "project management"
-    ],
-    "icon": "https://user-images.githubusercontent.com/115161827/209336312-4769d996-c1ff-4ac1-8843-d03f3b7193c4.jpg",
-    "icon_cover": true,
-    "poster": "https://user-images.githubusercontent.com/115161827/209336313-db3b90d5-1b0b-488e-8900-1ed1f33b0b89.jpg",
-    "entrypoint": "python -m uvicorn src.main:app --host 0.0.0.0 --port 8000",
-    "context_menu": {
-        "context_category": "Transform",
-        "target": [
-            "images_project",
-            "videos_project",
-            "point_cloud_project",
-            "volumes_project",
-            "point_cloud_episodes_project"
-        ]
-    },
-    "headless": false
+  "type": "app",
+  "version": "2.0.0",
+  "name": "Split datasets",
+  "description": "Split one or multiple datasets into parts",
+  "docker_image": "supervisely/data-operations:6.72.195",
+  "categories": [
+    "data operations",
+    "images",
+    "videos",
+    "dicom",
+    "pointclouds",
+    "project management"
+  ],
+  "icon": "https://user-images.githubusercontent.com/115161827/209336312-4769d996-c1ff-4ac1-8843-d03f3b7193c4.jpg",
+  "icon_cover": true,
+  "poster": "https://user-images.githubusercontent.com/115161827/209336313-db3b90d5-1b0b-488e-8900-1ed1f33b0b89.jpg",
+  "entrypoint": "python -m uvicorn src.main:app --host 0.0.0.0 --port 8000",
+  "context_menu": {
+    "context_category": "Transform",
+    "target": [
+      "images_project",
+      "videos_project",
+      "point_cloud_project",
+      "volumes_project",
+      "point_cloud_episodes_project"
+    ]
+  },
+  "headless": false
 }
