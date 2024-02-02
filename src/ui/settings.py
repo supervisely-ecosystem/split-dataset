@@ -1,3 +1,4 @@
+import supervisely as sly
 from supervisely.app.widgets import (
     Card,
     Container,
@@ -126,7 +127,18 @@ def get_settings():
 
     method = select_method_options.get_value()
     if method == str(g.SplitMethod.BY_RATIO):
-        parameters = [int(x) for x in settings[method][2]._content.get_value().split(":")]
+        parameters = []
+        input_ratio = settings[method][2]._content.get_value()
+        if input_ratio is not None and input_ratio != "":
+            for x in input_ratio.split(":"):
+                if x.isdigit():
+                    parameters.append(int(x))
+                else:
+                    try:
+                        x = int(float(x))
+                        parameters.append(x)
+                    except:
+                        sly.logger.warn(f"Invalid ratio value: {x}")
     else:
         parameters = [int(settings[method][2]._content.get_value())]
     return {
