@@ -1,3 +1,4 @@
+import supervisely as sly
 from supervisely.app.widgets import Button, Progress, ProjectThumbnail, Container
 import src.globals as g
 import src.ui as ui
@@ -45,9 +46,19 @@ def validate_settings(settings: dict):
         if split["method"] not in g.SplitMethod.values():
             return False
         if len(split["parameters"]) == 0:
+            sly.app.show_dialog(
+                title="Nothing to split",
+                description="Please, set split parameters.",
+                status="warning"
+            )
             return False
         for p in split["parameters"]:
             if p is None or p <= 0:
+                sly.app.show_dialog(
+                    title="Nothing to split",
+                    description="Please, set split parameters to positive numbers more than 0.",
+                    status="warning"
+                )
                 return False
     except Exception:
         return False
