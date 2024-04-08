@@ -37,7 +37,7 @@ settings_by_parts = Field(
 settings_by_ratio = Field(
     Input(placeholder="20:80"),
     title="Input ratio:",
-    description="Dataset sill be splitted to parts, corresponding to given ratio. E.g. dataset with 200 elements and given ratio of 15:25:60 will be splitted to 3 parts with 30, 50 and 120 elements correspondingly",
+    description="Dataset will be splitted into parts, corresponding to the given ratio. E.g. a dataset with 200 elements and given ratio of 15:25:60 will be splitted into 3 parts with 30, 50 and 120 elements correspondingly",
 )
 
 settings = {
