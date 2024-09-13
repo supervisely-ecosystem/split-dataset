@@ -52,8 +52,10 @@ def handle_table_button(datapoint: sly.app.widgets.Table.ClickedDataPoint):
     dataset_id = row[COL_ID]
     dataset_name = row[COL_NAME]
     if row[SELECT_DATASET] == "✅":
-        g.SELECTED_DATASETS_IDS.remove(dataset_id)
-        selected_datasets_names.remove(dataset_name)
+        if dataset_id in g.SELECTED_DATASETS_IDS:
+            g.SELECTED_DATASETS_IDS.remove(dataset_id)
+        if dataset_name in selected_datasets_names:
+            selected_datasets_names.remove(dataset_name)
         table.update_cell_value(COL_ID, dataset_id, SELECT_DATASET, "")
     else:
         g.SELECTED_DATASETS_IDS.add(dataset_id)
