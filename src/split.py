@@ -1,4 +1,5 @@
 from typing import List
+from random import shuffle
 
 import supervisely as sly
 from supervisely.app.widgets.sly_tqdm.sly_tqdm import CustomTqdm
@@ -83,9 +84,14 @@ def _split_images(
     dataset_info: sly.DatasetInfo,
     parts: List[int],
     progress_bar: CustomTqdm = None,
+    random_order: bool = False,
 ):
     images = api.image.get_list(dataset_info.id)
     img_ids = [img.id for img in images]
+
+    if random_order:
+        shuffle(img_ids)
+
     copied = 0
     for i, part in enumerate(parts):
         # create dataset
@@ -113,8 +119,13 @@ def _split_videos(
     dataset_info: sly.DatasetInfo,
     parts: List[int],
     progress_bar: CustomTqdm = None,
+    random_order: bool = False,
 ):
     videos = api.video.get_list(dataset_info.id)
+
+    if random_order:
+        shuffle(videos)
+
     key_id_map = KeyIdMap()
     copied = 0
     for i, part in enumerate(parts):
@@ -365,10 +376,14 @@ def split(
     split_method = split_settings["method"]
     split_parameters = split_settings["parameters"]
 
+    random_order = split_settings.get("random_order", False)
+
     for dataset in datasets:
         parts = _get_parts(split_method, dataset.items_count, split_parameters)
         if dest_project_info.type == str(sly.ProjectType.IMAGES):
-            _split_images(api, dest_project_info, dataset, parts, progress_bar)
+            _split_images(
+                api, dest_project_info, dataset, parts, progress_bar, random_order=random_order
+            )
         if dest_project_info.type == str(sly.ProjectType.VIDEOS):
             _split_videos(api, dest_project_info, dest_project_meta, dataset, parts, progress_bar)
         if dest_project_info.type == str(sly.ProjectType.POINT_CLOUDS):
