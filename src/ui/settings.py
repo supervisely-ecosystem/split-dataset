@@ -10,6 +10,7 @@ from supervisely.app.widgets import (
     Input,
     Empty,
     Field,
+    Checkbox,
 )
 from supervisely import ProjectType
 import src.globals as g
@@ -66,6 +67,13 @@ select_method_options = Select(items=[Select.Item(*s) for s in settings.values()
 select_method = Field(select_method_options, title="How to split dataset:")
 selected_settings = OneOf(select_method_options)
 
+random_order_checkbox = Checkbox("Random order")
+random_order_field = Field(
+    random_order_checkbox,
+    title="Randomize order of elements in each part",
+    description="If enabled, elements will be shuffled before splitting",
+)
+
 new_project_name_input = Input()
 new_project = Field(new_project_name_input, title="Project Name")
 
@@ -93,6 +101,7 @@ settings_card = Card(
                 widgets=[
                     select_method,
                     selected_settings,
+                    random_order_field,
                 ],
                 gap=10,
             ),
@@ -126,6 +135,7 @@ def get_settings():
         project_id = existing_project.get_selected_id()
 
     method = select_method_options.get_value()
+    random_order = random_order_checkbox.is_checked()
     if method == str(g.SplitMethod.BY_RATIO):
         parameters = []
         input_ratio = settings[method][2]._content.get_value()
@@ -152,5 +162,6 @@ def get_settings():
         "split": {
             "method": method,
             "parameters": parameters,
+            "random_order": random_order,
         },
     }
