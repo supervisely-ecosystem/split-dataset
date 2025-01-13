@@ -29,7 +29,7 @@ def build_table():
     rows = []
     table.loading = True
 
-    datasets = g.api.dataset.get_list(g.PROJECT_ID)
+    datasets = g.api.dataset.get_list(g.PROJECT_ID, recursive=True)
     g.DATASETS_INFO = {dataset.id: dataset for dataset in datasets}
     for dataset in datasets:
         rows.append(
