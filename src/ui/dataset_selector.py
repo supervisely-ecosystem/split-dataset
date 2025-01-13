@@ -31,11 +31,19 @@ def build_table():
 
     datasets = g.api.dataset.get_list(g.PROJECT_ID, recursive=True)
     g.DATASETS_INFO = {dataset.id: dataset for dataset in datasets}
+    ds_id_name_map = {dataset.id: dataset.name for dataset in datasets}
     for dataset in datasets:
+        dataset_name = dataset.name
+        current_dataset = dataset
+        while current_dataset.parent_id is not None:
+            parent_dataset = g.DATASETS_INFO[current_dataset.parent_id]
+            dataset_name = f"{ds_id_name_map[parent_dataset.id]}/{dataset_name}"
+            current_dataset = parent_dataset
+
         rows.append(
             [
                 dataset.id,
-                dataset.name,
+                dataset_name,
                 dataset.description,
                 dataset.items_count,
                 "",

@@ -85,6 +85,7 @@ def _split_images(
     parts: List[int],
     progress_bar: CustomTqdm = None,
     random_order: bool = False,
+    dataset_name: str = None,
 ):
     images = api.image.get_list(dataset_info.id)
     img_ids = [img.id for img in images]
@@ -95,7 +96,10 @@ def _split_images(
     copied = 0
     for i, part in enumerate(parts):
         # create dataset
-        ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        if dataset_name is None:
+            ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        else:
+            ds_name = dataset_name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
         created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
 
@@ -120,6 +124,7 @@ def _split_videos(
     parts: List[int],
     progress_bar: CustomTqdm = None,
     random_order: bool = False,
+    dataset_name: str = None,
 ):
     videos = api.video.get_list(dataset_info.id)
 
@@ -130,7 +135,10 @@ def _split_videos(
     copied = 0
     for i, part in enumerate(parts):
         # create dataset
-        ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        if dataset_name is None:
+            ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        else:
+            ds_name = dataset_name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
         created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
 
@@ -176,6 +184,7 @@ def _copy_pointcloud(
     dataset_info: sly.DatasetInfo,
     parts: List[int],
     progress_bar: CustomTqdm = None,
+    dataset_name: str = None,
 ):
     pcds_infos = api.pointcloud.get_list(dataset_id=dataset_info.id)
     key_id_map_initial = KeyIdMap()
@@ -183,7 +192,10 @@ def _copy_pointcloud(
     copied = 0
     for i, part in enumerate(parts):
         # create dataset
-        ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        if dataset_name is None:
+            ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        else:
+            ds_name = dataset_name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
         created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
 
@@ -238,13 +250,17 @@ def _copy_pointcloud_episodes(
     dataset_info: sly.DatasetInfo,
     parts: List[int],
     progress_bar: CustomTqdm = None,
+    dataset_name: str = None,
 ):
     pcd_episodes_infos = api.pointcloud_episode.get_list(dataset_id=dataset_info.id)
     key_id_map = KeyIdMap()
     copied = 0
     for i, part in enumerate(parts):
         # create dataset
-        ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        if dataset_name is None:
+            ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        else:
+            ds_name = dataset_name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
         created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
 
@@ -304,13 +320,17 @@ def _copy_volume(
     dataset_info: sly.DatasetInfo,
     parts: List[int],
     progress_bar: CustomTqdm = None,
+    dataset_name: str = None,
 ):
     volumes_infos = api.volume.get_list(dataset_id=dataset_info.id)
     key_id_map = KeyIdMap()
     copied = 0
     for i, part in enumerate(parts):
         # create dataset
-        ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        if dataset_name is None:
+            ds_name = dataset_info.name + f"-splitted-part-{i+1}"
+        else:
+            ds_name = dataset_name + f"-splitted-part-{i+1}"
         ds_description = f'This dataset is created by "Split dataset" application from "{dataset_info.name}"(id: {dataset_info.id}) dataset of "{project_info.name}"(id: {project_info.id}) Project'
         created_dataset = _create_destination_dataset(api, project_info.id, ds_name, ds_description)
 
@@ -378,24 +398,70 @@ def split(
 
     random_order = split_settings.get("random_order", False)
 
+    # Check unique names
+    ds_name_counter = {}
+    updated_names = {}
+    for dataset in datasets:
+        count = ds_name_counter.get(dataset.name, 0)
+        if count > 0:
+            unique_name = f"ds{count}_{dataset.name}"
+        else:
+            unique_name = dataset.name
+        ds_name_counter[dataset.name] = count + 1
+        updated_names[dataset.id] = unique_name
+
     for dataset in datasets:
         parts = _get_parts(split_method, dataset.items_count, split_parameters)
         if dest_project_info.type == str(sly.ProjectType.IMAGES):
             _split_images(
-                api, dest_project_info, dataset, parts, progress_bar, random_order=random_order
+                api,
+                dest_project_info,
+                dataset,
+                parts,
+                progress_bar,
+                random_order=random_order,
+                dataset_name=updated_names[dataset.id],
             )
         if dest_project_info.type == str(sly.ProjectType.VIDEOS):
-            _split_videos(api, dest_project_info, dest_project_meta, dataset, parts, progress_bar)
+            _split_videos(
+                api,
+                dest_project_info,
+                dest_project_meta,
+                dataset,
+                parts,
+                progress_bar,
+                dataset_name=updated_names[dataset.id],
+            )
         if dest_project_info.type == str(sly.ProjectType.POINT_CLOUDS):
             _copy_pointcloud(
-                api, dest_project_info, dest_project_meta, dataset, parts, progress_bar
+                api,
+                dest_project_info,
+                dest_project_meta,
+                dataset,
+                parts,
+                progress_bar,
+                dataset_name=updated_names[dataset.id],
             )
         if dest_project_info.type == str(sly.ProjectType.POINT_CLOUD_EPISODES):
             _copy_pointcloud_episodes(
-                api, dest_project_info, dest_project_meta, dataset, parts, progress_bar
+                api,
+                dest_project_info,
+                dest_project_meta,
+                dataset,
+                parts,
+                progress_bar,
+                dataset_name=updated_names[dataset.id],
             )
         if dest_project_info.type == str(sly.ProjectType.VOLUMES):
-            _copy_volume(api, dest_project_info, dest_project_meta, dataset, parts, progress_bar)
+            _copy_volume(
+                api,
+                dest_project_info,
+                dest_project_meta,
+                dataset,
+                parts,
+                progress_bar,
+                dataset_name=updated_names[dataset.id],
+            )
 
     dest_project_info = api.project.get_info_by_id(dest_project_info.id)
     return dest_project_info
